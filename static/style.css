@@ -1,0 +1,81 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #181a1b;
+  color: #e0e0e0;
+  padding: 30px;
+  text-align: center;
+  transition: background 0.3s, color 0.3s;
+}
+
+.container {
+  max-width: 600px;
+  margin: auto;
+  background: #23272b;
+  color: #e0e0e0;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  transition: background 0.3s, color 0.3s;
+}
+
+#drop-area {
+  border: 2px dashed #444;
+  padding: 30px;
+  margin: 20px 0;
+  cursor: pointer;
+  background: #23272b;
+  color: #e0e0e0;
+  border-radius: 6px;
+  transition: background 0.3s, color 0.3s;
+}
+
+.format-select {
+  margin-bottom: 15px;
+}
+
+progress {
+  width: 100%;
+  height: 20px;
+  margin: 10px 0 20px;
+}
+
+button {
+  padding: 10px 20px;
+  background: #444;
+  border: none;
+  color: #e0e0e0;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 8px;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background: #222;
+}
+
+/* Dark mode styles */
+body.dark-mode {
+  background: #181a1b;
+  color: #e0e0e0;
+}
+
+body.dark-mode .container {
+  background: #23272b;
+  color: #e0e0e0;
+}
+
+body.dark-mode #drop-area {
+  background: #23272b;
+  border-color: #444;
+  color: #e0e0e0;
+}
+
+body.dark-mode button {
+  background: #444;
+  color: #e0e0e0;
+}
+
+body.dark-mode button:hover {
+  background: #222;
+}

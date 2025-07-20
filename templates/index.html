@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AAC to Audio Converter</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <h1>AAC Batch Audio Converter</h1>
+    <form id="upload-form">
+      <div id="drop-area">
+        <input type="file" id="fileElem" name="audio_files" multiple accept=".aac" hidden>
+        <label for="fileElem" id="fileLabel">Drop .aac files or click to browse</label>
+      </div>
+
+      <div class="format-select">
+        <label for="format">Convert to:</label>
+        <select name="format" id="format">
+          <option value="wav">WAV (24-bit)</option>
+          <option value="flac">FLAC</option>
+          <option value="mp3">MP3 (320 kbps)</option>
+        </select>
+      </div>
+
+      <progress id="progressBar" value="0" max="100"></progress>
+      <button type="submit">Convert & Download ZIP</button>
+      <button type="button" id="toggle-dark">Toggle Dark Mode</button>
+    </form>
+  </div>
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+outputs/input.wav
+__pycache__/
+*.pyc
+.venv/
+outputs/
+uploads/
+*.log
