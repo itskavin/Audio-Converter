@@ -2,32 +2,160 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>AAC to Audio Converter</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Local Audio Converter</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-  <div class="container">
-    <h1>AAC Batch Audio Converter</h1>
-    <form id="upload-form">
-      <div id="drop-area">
-        <input type="file" id="fileElem" name="audio_files" multiple accept=".aac" hidden>
-        <label for="fileElem" id="fileLabel">Drop .aac files or click to browse</label>
-      </div>
+  <div class="layout">
+    <aside class="overview">
+      <div class="overview__badge">Local audio lab</div>
+      <h1 class="overview__title">Professional conversions, entirely offline.</h1>
+      <p class="overview__subtitle">Process any mix of audio formats without leaving your browser. Your stems stay on this device, and FFmpeg handles the heavy lifting.</p>
 
-      <div class="format-select">
-        <label for="format">Convert to:</label>
-        <select name="format" id="format">
-          <option value="wav">WAV (24-bit)</option>
-          <option value="flac">FLAC</option>
-          <option value="mp3">MP3 (320 kbps)</option>
-        </select>
-      </div>
+      <ul class="overview__steps" aria-label="Conversion steps">
+        <li>
+          <span class="step-number">1</span>
+          <div>
+            <strong>Drop or browse your files</strong>
+            <p>Drag them in or select from disk. We detect the format automatically.</p>
+          </div>
+        </li>
+        <li>
+          <span class="step-number">2</span>
+          <div>
+            <strong>Choose an output profile</strong>
+            <p>Select a mastering-ready preset or specify a custom extension.</p>
+          </div>
+        </li>
+        <li>
+          <span class="step-number">3</span>
+          <div>
+            <strong>Download instantly</strong>
+            <p>Grab individual tracks or a single ZIP archive when the batch completes.</p>
+          </div>
+        </li>
+      </ul>
 
-      <progress id="progressBar" value="0" max="100"></progress>
-      <button type="submit">Convert & Download ZIP</button>
-      <button type="button" id="toggle-dark">Toggle Dark Mode</button>
-    </form>
+      <div class="overview__stats">
+        <div>
+          <span class="stat-label">Supported formats</span>
+          <span class="stat-value">20+</span>
+        </div>
+        <div>
+          <span class="stat-label">Processing</span>
+          <span class="stat-value">Local / lossless</span>
+        </div>
+        <div>
+          <span class="stat-label">FFmpeg core</span>
+          <span class="stat-value">v7 ready</span>
+        </div>
+      </div>
+    </aside>
+
+    <main class="console">
+      <header class="console__header">
+        <div>
+          <h2>Convert your session</h2>
+          <p>Queue multiple files and export to studio-grade presets or your own custom extension.</p>
+        </div>
+        <span class="console__hint">Nothing leaves your machine.</span>
+      </header>
+
+      <form id="convert-form" class="console__form" autocomplete="off">
+        <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Drop audio files or browse">
+          <input type="file" id="file-input" name="audio_files" accept="audio/*" multiple hidden>
+          <div class="dropzone__art" aria-hidden="true">
+            <svg width="72" height="72" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="6" y="14" width="60" height="44" rx="12" class="dropzone__frame"/>
+              <path d="M36 46V26" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" class="dropzone__stroke"/>
+              <path d="M26 34L36 24L46 34" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" class="dropzone__stroke"/>
+              <path d="M22 50H50" stroke-width="3.5" stroke-linecap="round" class="dropzone__stroke"/>
+            </svg>
+          </div>
+          <div class="dropzone__copy">
+            <span class="dropzone__primary">Drop audio files anywhere here</span>
+            <span class="dropzone__secondary">or <button type="button" class="link" id="browse-button">browse your library</button></span>
+            <span class="dropzone__hint">We support AAC, WAV, FLAC, MP3, OGG, OPUS, WMA, AIFF, and more.</span>
+          </div>
+        </div>
+
+        <div class="file-list" id="file-list" data-empty>
+          <div class="file-list__empty" aria-live="polite">No files yet — drop or browse to start your batch.</div>
+        </div>
+
+        <section class="options"
+                 aria-label="Conversion options">
+          <label class="field">
+            <span class="field__label">Target format</span>
+            <div class="field__control">
+              <select id="format" name="format">
+                <option value="mp3" selected>MP3 · 320 kbps</option>
+                <option value="wav">WAV · 48 kHz PCM</option>
+                <option value="flac">FLAC · lossless</option>
+                <option value="ogg">OGG Vorbis</option>
+                <option value="opus">OPUS</option>
+                <option value="aac">AAC (m4a)</option>
+                <option value="aiff">AIFF</option>
+                <option value="wma">WMA</option>
+                <option value="custom">Custom extension…</option>
+              </select>
+            </div>
+          </label>
+
+          <label class="field field--hidden" id="custom-format-field">
+            <span class="field__label">Custom extension</span>
+            <div class="field__control">
+              <input type="text" id="custom-format" name="custom_format" placeholder="e.g. aiff" minlength="2" maxlength="10" pattern="^[a-zA-Z0-9]+$" autocomplete="off">
+            </div>
+            <p class="field__hint">Letters or numbers only. FFmpeg will infer the best encoder.</p>
+          </label>
+
+          <div class="option-toggles">
+            <label class="toggle">
+              <input type="checkbox" id="zip-toggle" name="bundle_zip" checked>
+              <span class="toggle__label">Bundle the batch into a single ZIP file</span>
+            </label>
+
+            <label class="toggle">
+              <input type="checkbox" id="individual-toggle" name="individual_links" checked>
+              <span class="toggle__label">Provide individual download links for each track</span>
+            </label>
+          </div>
+        </section>
+
+        <div class="controls">
+          <button type="submit" class="button button--primary" id="convert-button" disabled>
+            <span class="button__label">Convert audio</span>
+            <span class="button__spinner" aria-hidden="true"></span>
+          </button>
+          <button type="button" class="button button--ghost" id="clear-button" disabled>Clear queue</button>
+        </div>
+
+        <div class="progress" id="progress" hidden>
+          <div class="progress__header">
+            <span id="progress-label">Preparing…</span>
+            <span id="progress-percent">0%</span>
+          </div>
+          <div class="progress__bar"><span id="progress-bar"></span></div>
+        </div>
+      </form>
+
+      <section class="results" id="results" hidden aria-live="polite"></section>
+    </main>
   </div>
-  <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+  <template id="file-item-template">
+    <div class="file-item" data-name="">
+      <div class="file-item__icon" aria-hidden="true"></div>
+      <div class="file-item__meta">
+        <span class="file-item__name"></span>
+        <span class="file-item__format"></span>
+      </div>
+      <button type="button" class="file-item__remove" title="Remove from list" aria-label="Remove file">&times;</button>
+    </div>
+  </template>
+
+  <script src="{{ url_for('static', filename='script.js') }}" defer></script>
 </body>
 </html>
