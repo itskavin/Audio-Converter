@@ -1,10 +1,55 @@
+// Click to browse functionality
 document.getElementById("drop-area").addEventListener("click", () => {
   document.getElementById("fileElem").click();
 });
 
+// File selection change handler
 document.getElementById("fileElem").addEventListener("change", () => {
   document.getElementById("fileLabel").innerText = [...fileElem.files].map(f => f.name).join(", ");
 });
+
+// Drag and drop functionality
+const dropArea = document.getElementById("drop-area");
+
+// Prevent default drag behaviors
+['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+  dropArea.addEventListener(eventName, preventDefaults, false);
+  document.body.addEventListener(eventName, preventDefaults, false);
+});
+
+// Highlight drop area when item is dragged over it
+['dragenter', 'dragover'].forEach(eventName => {
+  dropArea.addEventListener(eventName, highlight, false);
+});
+
+['dragleave', 'drop'].forEach(eventName => {
+  dropArea.addEventListener(eventName, unhighlight, false);
+});
+
+// Handle dropped files
+dropArea.addEventListener('drop', handleDrop, false);
+
+function preventDefaults(e) {
+  e.preventDefault();
+  e.stopPropagation();
+}
+
+function highlight(e) {
+  dropArea.classList.add('drag-over');
+}
+
+function unhighlight(e) {
+  dropArea.classList.remove('drag-over');
+}
+
+function handleDrop(e) {
+  const dt = e.dataTransfer;
+  const files = dt.files;
+  
+  // Update the file input element with dropped files
+  document.getElementById("fileElem").files = files;
+  document.getElementById("fileLabel").innerText = [...files].map(f => f.name).join(", ");
+}
 
 document.getElementById("upload-form").addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -51,17 +96,31 @@ document.getElementById("upload-form").addEventListener("submit", async (e) => {
     }
   };
 
-  xhr.responseType = 'blob';
+  xhr.responseType = 'json';
   xhr.onload = () => {
     if (xhr.status === 200) {
-      const blob = new Blob([xhr.response], { type: "application/zip" });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "converted_audio.zip";
-      link.click();
+      const response = xhr.response;
+      if (response.success && response.files) {
+        // Download each file individually with a small delay
+        response.files.forEach((file, index) => {
+          setTimeout(() => {
+            const link = document.createElement("a");
+            link.href = `/download/${file.filename}`;
+            link.download = file.filename;
+            link.click();
+          }, index * 500); // 500ms delay between downloads
+        });
+        
+        // Show success message
+        document.getElementById("fileLabel").innerText = `Successfully converted ${response.files.length} file(s)!`;
+        setTimeout(() => {
+          document.getElementById("fileLabel").innerText = "Drop .aac files or click to browse";
+        }, 3000);
+      }
       progressBar.value = 0;
     } else {
       alert("Conversion failed.");
+      progressBar.value = 0;
     }
   };
   xhr.send(formData);

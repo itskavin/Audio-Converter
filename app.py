@@ -60,15 +60,25 @@ def convert():
             except subprocess.CalledProcessError:
                 continue
 
-    if len(output_files) == 1:
-        # Single file: send directly
-        return send_file(output_files[0], as_attachment=True)
-    elif len(output_files) > 1:
-        # Multiple files: zip and send
-        output_zip_path = os.path.join(OUTPUT_FOLDER, f"converted_{timestamp}.zip")
-        with zipfile.ZipFile(output_zip_path, 'w') as zipf:
-            for f in output_files:
-                zipf.write(f, os.path.basename(f))
-        return send_file(output_zip_path, as_attachment=True)
+    if len(output_files) >= 1:
+        # Return list of converted files for individual downloads
+        file_list = []
+        for f in output_files:
+            file_list.append({
+                'filename': os.path.basename(f),
+                'path': f
+            })
+        return jsonify({"success": True, "files": file_list})
     else:
         return jsonify({"error": "No valid .aac files uploaded."}), 400
+
+@app.route("/download/<filename>", methods=["GET"])
+def download_file(filename):
+    # Security: ensure filename is in outputs directory and is safe
+    safe_filename = secure_filename(filename)
+    file_path = os.path.join(OUTPUT_FOLDER, safe_filename)
+    
+    if os.path.exists(file_path) and os.path.commonpath([OUTPUT_FOLDER, file_path]) == OUTPUT_FOLDER:
+        return send_file(file_path, as_attachment=True)
+    else:
+        return jsonify({"error": "File not found"}), 404
