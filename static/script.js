@@ -345,6 +345,14 @@ const handleFormatChange = () => {
 
 browseButton.addEventListener("click", () => fileInput.click());
 
+dropzone.addEventListener("click", (event) => {
+  // Let the dedicated browse button handle its own click.
+  if (event.target.closest("#browse-button")) {
+    return;
+  }
+  fileInput.click();
+});
+
 fileInput.addEventListener("change", (event) => {
   addFiles(event.target.files || []);
 });
