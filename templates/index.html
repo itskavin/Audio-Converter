@@ -54,16 +54,9 @@
     </aside>
 
     <main class="console">
-      <header class="console__header">
-        <div>
-          <h2>Convert your session</h2>
-          <p>Queue multiple files and export to studio-grade presets or your own custom extension.</p>
-        </div>
-        <span class="console__hint">Nothing leaves your machine.</span>
-      </header>
-
       <form id="convert-form" class="console__form" autocomplete="off">
-        <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Drop audio files or browse">
+        <div class="console__queue">
+          <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Drop audio files or browse">
           <input type="file" id="file-input" name="audio_files" accept="audio/*" multiple hidden>
           <div class="dropzone__art" aria-hidden="true">
             <svg width="72" height="72" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -84,6 +77,18 @@
           <div class="file-list__empty" aria-live="polite">No files yet — drop or browse to start your batch.</div>
         </div>
 
+        <div class="progress" id="progress" hidden>
+          <div class="progress__header">
+            <span id="progress-label">Preparing…</span>
+            <span id="progress-percent">0%</span>
+          </div>
+          <div class="progress__bar"><span id="progress-bar"></span></div>
+        </div>
+
+        <section class="results" id="results" hidden aria-live="polite"></section>
+        </div>
+
+        <div class="console__settings">
         <section class="options"
                  aria-label="Conversion options">
           <label class="field">
@@ -131,17 +136,8 @@
           </button>
           <button type="button" class="button button--ghost" id="clear-button" disabled>Clear queue</button>
         </div>
-
-        <div class="progress" id="progress" hidden>
-          <div class="progress__header">
-            <span id="progress-label">Preparing…</span>
-            <span id="progress-percent">0%</span>
-          </div>
-          <div class="progress__bar"><span id="progress-bar"></span></div>
         </div>
       </form>
-
-      <section class="results" id="results" hidden aria-live="polite"></section>
     </main>
   </div>
 
