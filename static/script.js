@@ -9,8 +9,6 @@ const clearButton = document.getElementById("clear-button");
 const formatSelect = document.getElementById("format");
 const customFormatField = document.getElementById("custom-format-field");
 const customFormatInput = document.getElementById("custom-format");
-const zipToggle = document.getElementById("zip-toggle");
-const individualToggle = document.getElementById("individual-toggle");
 const progressBlock = document.getElementById("progress");
 const progressLabel = document.getElementById("progress-label");
 const progressPercent = document.getElementById("progress-percent");
@@ -180,7 +178,17 @@ const renderResults = (payload) => {
   const list = document.createElement("div");
   list.className = "results__list";
 
-  if (payload.zip && payload.zip.url) {
+  if (payload.files?.length === 1) {
+    const file = payload.files[0];
+    const link = document.createElement("a");
+    link.href = file.url;
+    link.download = file.converted_name || file.filename;
+    link.click();
+    const note = document.createElement("p");
+    note.className = "download-note";
+    note.textContent = `Your converted file, ${file.converted_name || file.filename}, is downloading.`;
+    list.appendChild(note);
+  } else if (payload.zip?.url) {
     const zipItem = document.createElement("div");
     zipItem.className = "result-item";
     zipItem.innerHTML = `
@@ -196,7 +204,7 @@ const renderResults = (payload) => {
     list.appendChild(zipItem);
   }
 
-  if (payload.files?.length && individualToggle.checked) {
+  if (payload.files?.length > 1) {
     payload.files.forEach((file) => {
       const item = document.createElement("div");
       item.className = "result-item";
@@ -269,13 +277,6 @@ const prepareFormData = () => {
     formData.append("format", customFormatInput.value.trim().toLowerCase());
   } else {
     formData.append("format", formatSelect.value);
-  }
-
-  if (zipToggle.checked) {
-    formData.append("bundle_zip", "1");
-  }
-  if (individualToggle.checked) {
-    formData.append("individual_links", "1");
   }
 
   return formData;

@@ -85,8 +85,10 @@ def convert():
         extension = requested_format
         extra_args = []
 
-    bundle_zip = request.form.get("bundle_zip") is not None
-    include_individual = request.form.get("individual_links") is not None
+    # A single output is always downloaded directly. For batches, return both
+    # download choices so the client can present them after conversion.
+    bundle_zip = len(files) > 1
+    include_individual = True
 
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
     batch_id = f"batch_{timestamp}"
